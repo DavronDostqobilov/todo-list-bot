@@ -4,4 +4,6 @@ from .bot import (
     add_task,
     delete_task,
     mark,
+    menu,
+    write_task
 )

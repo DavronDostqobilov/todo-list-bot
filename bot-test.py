@@ -5,6 +5,8 @@ from todo import (
     add_task,
     delete_task,
     mark,
+    menu,
+    write_task,
 )
 import os
 
@@ -20,10 +22,15 @@ def main():
 
     # handlers
     dp.add_handler(CommandHandler(['start', 'boshlash'], start))
-    dp.add_handler(MessageHandler(Filters.text('my tasks'), get_tasks))
+    dp.add_handler(CallbackQueryHandler(get_tasks, pattern='get_task'))
+    dp.add_handler(CallbackQueryHandler(write_task, pattern='add_task'))
+    dp.add_handler(CallbackQueryHandler(delete_task, pattern='delete_task'))
+    dp.add_handler(CallbackQueryHandler(mark, pattern='task'))
+    dp.add_handler(CallbackQueryHandler(menu, pattern='bosh_menu'))
+    dp.add_handler(CallbackQueryHandler(menu, pattern='menu'))
     dp.add_handler(MessageHandler(Filters.text, add_task))
-    dp.add_handler(CallbackQueryHandler(callback=delete_task, pattern=('delete_task')))
-    dp.add_handler(CallbackQueryHandler(callback=mark, pattern=('mark')))
+
+    
 
     # polling started
     updater.start_polling()
