@@ -1,6 +1,7 @@
 import requests
 from .settings import base_url
 from telegram import (Update, InlineKeyboardButton,CallbackQuery,InlineKeyboardMarkup,InlineQuery)
+from telegram import Update, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext
 
 
@@ -24,6 +25,10 @@ def start(update: Update, context: CallbackContext):
     btn1=InlineKeyboardButton(text='Menu', callback_data="menu")
     keyboard=InlineKeyboardMarkup([[btn1]])
     update.message.reply_markdown_v2('*Hello, welcome to our bot\!*', reply_markup=keyboard)
+    btn = KeyboardButton(text='my tasks')
+    update.message.reply_markdown_v2(
+        '*Hello, welcome to our bot\!*\n\n_select name for creating task_',
+        reply_markup=ReplyKeyboardMarkup(keyboard=[[btn]]))
     
 def menu(update: Update, context: CallbackContext):
     bot = context.bot
@@ -47,6 +52,24 @@ def get_tasks(update: Update, context: CallbackContext):
     if data==[]:
         btn1 = InlineKeyboardButton(text="🏘 Bosh Menu", callback_data="bosh_menu")
         keyboard.append([btn1])
+    '''add new task'''
+    chat_id = update.message.chat.id
+
+    url_for_get_tasks = f'{base_url}/get-tasks/{chat_id}'
+    response = requests.get(url_for_get_tasks)
+
+    msg = ''
+    if response.status_code == 200:
+        tasks = response.json()
+        
+        for task in tasks:
+            btn = InlineKeyboardButton(text=task['name'], callback_data=task['name'])
+            if task['done']:
+                msg += f'✅ {task["name"]}\n'
+            else:
+                msg += f'❌ {task["name"]}\n'
+        update.message.reply_html(msg)
+
 
         keyboard = InlineKeyboardMarkup(keyboard)
         query.edit_message_text( 'Empty \n', reply_markup=keyboard)
@@ -87,8 +110,6 @@ def add_task(update: Update, context: CallbackContext):
     r=requests.post(url=url, json=datf)
     bot.sendMessage(chat_id, 'added task✅')
     return r
-    
-
 def delete_task(update: Update, context: CallbackContext):
     '''add new task'''
     query = update.callback_query

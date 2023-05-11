@@ -1,1 +1,1 @@
-base_url = 'https://davronjan.pythonanywhere.com/'
+base_url = 'https://todolisapi.pythonanywhere.com'

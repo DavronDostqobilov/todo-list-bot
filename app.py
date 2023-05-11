@@ -11,8 +11,6 @@ from todo import (
     menu,
     write_task,
 )
-import os
-
 TOKEN ="6149369057:AAFwx8G3CHGlxC2UyXnUV0FkLTKP6F5IBwk"
 bot = telegram.Bot(TOKEN)
 
