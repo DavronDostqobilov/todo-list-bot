@@ -1,4 +1,7 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
+from flask import Flask, request
+from telegram import Update
+import telegram
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler,Dispatcher
 from todo import (
     start,
     get_tasks,
@@ -11,14 +14,19 @@ from todo import (
 import os
 
 TOKEN ="6149369057:AAFwx8G3CHGlxC2UyXnUV0FkLTKP6F5IBwk"
+bot = telegram.Bot(TOKEN)
+
+app = Flask(__name__)
+@app.route("/")
+def ishladi():
+    return "Bot ishladi"
 
 
-def main():
-    # updater obj
-    updater = Updater(token=TOKEN)
-
-    # dispetcher obj
-    dp = updater.dispatcher
+@app.route("/webhook", methods=["POST"])
+def home():
+    dp = Dispatcher(bot, None, workers=0)
+    data = request.get_json(force=True)
+    update = Update.de_json(data, bot)
 
     # handlers
     dp.add_handler(CommandHandler(['start', 'boshlash'], start))
@@ -29,12 +37,7 @@ def main():
     dp.add_handler(CallbackQueryHandler(menu, pattern='bosh_menu'))
     dp.add_handler(CallbackQueryHandler(menu, pattern='menu'))
     dp.add_handler(MessageHandler(Filters.text, add_task))
-
-    
-
-    # polling started
-    updater.start_polling()
-    updater.idle()
+    return 'ok'
 
 if __name__ == '__main__':
-    main()
+    app.run(debug=True)
